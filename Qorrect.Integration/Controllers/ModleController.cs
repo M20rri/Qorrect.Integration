@@ -148,7 +148,21 @@ namespace Qorrect.Integration.Controllers
             request.AddParameter("application/json", JsonConvert.SerializeObject(model), ParameterType.RequestBody);
             IRestResponse response = await client.ExecuteAsync(request);
             var item = JsonConvert.DeserializeObject<DTOAddEditCourse>(response.Content);
-
+            /////
+            var clogger = new DTORequestResponseLog
+            {
+                CourseID = Convert.ToInt32(Course.id),
+                CourseName = Course.fullname,
+                Device = "Moodel",
+                ErrorQuestionID = 0,
+                logRequest = JsonConvert.SerializeObject(model),
+                logResponse = JsonConvert.SerializeObject(response.Content),
+                RequestUri = client.BaseUrl.AbsoluteUri,
+                StatusCode = response.StatusDescription,
+                QuestionID = 0
+            };
+            await new CourseDataAccessLayer().RequestResponseLogger(bedoIntegrationString, clogger);
+            ////////
             #region Apply Outline structure to course
             {
                 var applyOutlineclient = new RestClient($"{_configUrl.QorrectBaseUrl}/course/applyOutline");
@@ -455,6 +469,7 @@ namespace Qorrect.Integration.Controllers
                                     var logger = new DTORequestResponseLog
                                     {
                                         CourseID = Convert.ToInt32(Course.id),
+                                        CourseName = Course.fullname,
                                         Device = "Moodel",
                                         ErrorQuestionID = cID,
                                         logRequest = JsonConvert.SerializeObject(MCQbody),
@@ -463,7 +478,6 @@ namespace Qorrect.Integration.Controllers
                                         StatusCode = mcqresponse.StatusDescription,
                                         QuestionID = cID
                                     };
-                                    var ccc = logger;
                                     await new CourseDataAccessLayer().RequestResponseLogger(bedoIntegrationString, logger);
                                 }
                                 #endregion
@@ -481,6 +495,7 @@ namespace Qorrect.Integration.Controllers
                                     var logger = new DTORequestResponseLog
                                     {
                                         CourseID = Convert.ToInt32(Course.id),
+                                        CourseName = Course.fullname,
                                         Device = "Moodel",
                                         ErrorQuestionID = cID,
                                         logRequest = JsonConvert.SerializeObject(Essaybody),

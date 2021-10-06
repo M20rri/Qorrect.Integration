@@ -10,5 +10,6 @@
         public int QuestionID { get; set; }
         public string Device { get; set; }
         public string StatusCode { get; set; }
+        public string CourseName { get; set; }
     }
 }

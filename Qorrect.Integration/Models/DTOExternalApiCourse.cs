@@ -149,7 +149,14 @@ namespace Qorrect.Integration.Models
         public Guid? Id { get; set; }
         public string Name { get; set; }
     }
+    public class DTOTransferedCourse
+    {
+        public int Id { get; set; }
+        public string CourseName { get; set; }
+        public string InsertedItems { get; set; }
+        public string LostItems { get; set; }
 
+    }
     public class DTOBedoCourse
     {
         public int Id { get; set; }

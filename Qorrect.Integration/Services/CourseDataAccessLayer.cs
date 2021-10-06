@@ -217,6 +217,7 @@ namespace Qorrect.Integration.Services
                     cmd.Parameters.AddWithValue("@QuesId", model.QuestionID);
                     cmd.Parameters.AddWithValue("@StCode", model.StatusCode);
                     cmd.Parameters.AddWithValue("@Dev", model.Device);
+                    cmd.Parameters.AddWithValue("@CourseName", model.CourseName);
                     con.Open();
                     cmd.ExecuteNonQuery();
                     con.Close();
@@ -292,5 +293,30 @@ namespace Qorrect.Integration.Services
             return _managedUrl;
         }
 
+        public async Task<List<DTOTransferedCourse>> GetTransferedCourses(string bedoIntegrationString)
+        {
+            List<DTOTransferedCourse> lstCourse = new List<DTOTransferedCourse>();
+            using (SqlConnection con = new SqlConnection(bedoIntegrationString))
+            {
+                SqlCommand cmd = new SqlCommand("SP_GetTransferedCourses", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                con.Open();
+                SqlDataReader rdr = cmd.ExecuteReader();
+
+                while (rdr.Read())
+                {
+                    lstCourse.Add(new DTOTransferedCourse()
+                    {
+                        Id = Convert.ToInt32(rdr["CourseID"]),
+                        CourseName = rdr["CourseName"].ToString(),
+                        // CourseCode = rdr["total"].ToString(),
+                        InsertedItems = ((Convert.ToInt32(rdr["ok"].ToString()))-1).ToString(),
+                        LostItems = rdr["lost"].ToString(),
+                    });
+                }
+                con.Close();
+            }
+            return lstCourse.ToList();
+        }
     }
 }
