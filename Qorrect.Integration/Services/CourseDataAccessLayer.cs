@@ -309,7 +309,6 @@ namespace Qorrect.Integration.Services
                     {
                         Id = Convert.ToInt32(rdr["CourseID"]),
                         CourseName = rdr["CourseName"].ToString(),
-                        // CourseCode = rdr["total"].ToString(),
                         InsertedItems = ((Convert.ToInt32(rdr["ok"].ToString()))-1).ToString(),
                         LostItems = rdr["lost"].ToString(),
                     });
