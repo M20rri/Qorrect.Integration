@@ -155,6 +155,10 @@ namespace Qorrect.Integration.Models
         public string CourseName { get; set; }
         public string InsertedItems { get; set; }
         public string LostItems { get; set; }
+        public string ResponseBody { get; set; }
+        
+        public string QuestionID { get; set; }
+        
 
     }
     public class DTOBedoCourse

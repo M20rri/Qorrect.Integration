@@ -37,6 +37,13 @@ namespace Qorrect.Integration.Controllers
             return Ok(bedoCourses);
         }
         [HttpGet]
+        [Route("GetLostItems/{id}")]
+        public async Task<IActionResult> GetLostItems([FromRoute] string id)
+        {
+            var bedoCourses = await new CourseDataAccessLayer().GetLostItems(bedoIntegrationString,id);
+            return Ok(bedoCourses);
+        }
+        [HttpGet]
         [Route("TransferedCoursesList")]
         public async Task<IActionResult> GetTransferedCoursesList()
         {

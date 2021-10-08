@@ -318,5 +318,33 @@ namespace Qorrect.Integration.Services
             }
             return lstCourse.ToList();
         }
+
+
+        public async Task<List<DTOTransferedCourse>> GetLostItems(string bedoIntegrationString,string courseID)
+        {
+            List<DTOTransferedCourse> lstCourse = new List<DTOTransferedCourse>();
+            using (SqlConnection con = new SqlConnection(bedoIntegrationString))
+            {
+                SqlCommand cmd = new SqlCommand("SP_GetLostItems", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@CourseID", courseID);
+                con.Open();
+                SqlDataReader rdr = cmd.ExecuteReader();
+
+                while (rdr.Read())
+                {
+                    lstCourse.Add(new DTOTransferedCourse()
+                    {
+                        Id = Convert.ToInt32(rdr["CourseID"]),
+                        CourseName = rdr["CourseName"].ToString(),
+                         ResponseBody = rdr["ResponseBody"].ToString(),
+                        //InsertedItems = ((Convert.ToInt32(rdr["ok"].ToString())) - 1).ToString(),
+                        QuestionID = rdr["QuestionID"].ToString(),
+                    });
+                }
+                con.Close();
+            }
+            return lstCourse.ToList();
+        }
     }
 }
