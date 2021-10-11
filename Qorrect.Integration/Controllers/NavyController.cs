@@ -354,7 +354,6 @@ namespace Qorrect.Integration.Controllers
                                         }
 
                                     }
-
                                     #region Get Questions from bedo by Ilo
 
                                     {
@@ -363,7 +362,11 @@ namespace Qorrect.Integration.Controllers
                                         {
 
                                             BedoQueastionsWithAnswers = await new CourseDataAccessLayer().GetItemsByIlo(_configUrl.BedobaseUrl , bedoIlo.Id);
-
+                                            //if (BedoQueastionsWithAnswers. == 18777)
+                                            //{
+                                            //    var zzz = bedoIlo;
+                                            //    int cc = questionEssay.Id;
+                                            //}
                                             #region MCQ
                                             foreach (var question in BedoQueastionsWithAnswers.Where(x => x.QuestionTypeID == 1))
                                             {
@@ -451,7 +454,8 @@ namespace Qorrect.Integration.Controllers
                                             #region Essay
                                             foreach (var questionEssay in BedoQueastionsWithAnswers.Where(x => x.QuestionTypeID == 4))
                                             {
-
+                                                if (ListOfBedoItemsInsertedtoQorrect.Contains(questionEssay.Id)) { continue; }
+                                                ListOfBedoItemsInsertedtoQorrect.Add(questionEssay.Id);
                                                 Guid CourseSubscriptionId = Guid.Parse(courseRequest.CourseSubscriptionId);
                                                 var Essayclient = new RestClient($"{_configUrl.QorrectBaseUrl}/item/Essay");
                                                 Essayclient.Timeout = -1;
