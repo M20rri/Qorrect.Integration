@@ -10,6 +10,7 @@ namespace Qorrect.Integration.Models
         public string id { get; set; }
         public string idnumber { get; set; }
         public string summary { get; set; }
+        public string category { get; set; }
     }
 
     public class DTOTag
