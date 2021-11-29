@@ -5,6 +5,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
+using Qorrect.Integration.Services;
+using StackExchange.Redis;
 using System.IO;
 
 namespace Qorrect.Integration
@@ -22,8 +24,9 @@ namespace Qorrect.Integration
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddCors();
-            services.AddControllers();
-
+            services.AddControllers();         
+            services.AddSingleton<IConnectionMultiplexer>(x => ConnectionMultiplexer.Connect(Configuration.GetValue<string>("RedisConnection")));
+            services.AddSingleton<ICacheService, RedisCacheService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

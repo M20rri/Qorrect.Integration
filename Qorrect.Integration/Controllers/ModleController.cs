@@ -33,6 +33,8 @@ namespace Qorrect.Integration.Controllers
             _webHostEnvironment = webHostEnvironment;
         }
 
+
+
         [HttpPost]
         [Route("GenerateToken")]
         public async Task<IActionResult> GenerateToken(DTOLogin model)
@@ -46,6 +48,7 @@ namespace Qorrect.Integration.Controllers
             IRestResponse response = await client.ExecuteAsync(request);
             return Ok(JsonConvert.DeserializeObject<DTOTokenResponse>(response.Content));
         }
+
 
         [HttpGet]
         [Route("CategoryList")]
@@ -64,36 +67,34 @@ namespace Qorrect.Integration.Controllers
         }
 
 
-        [HttpGet]
+        [HttpPost]
         [Route("CourseList")]
-        public async Task<IActionResult> CourseList([FromQuery] string wstoken , [FromQuery] string codes)
+        public async Task<IActionResult> CourseList([FromBody] DTOClassFromGroup model)
         {
-            List<string> _codes = codes.Split(",").ToList();
+            List<string> _codes = model.codes.Split(",").ToList();
             List<DTOMoodleCategory> moodleCategories = new List<DTOMoodleCategory>();
             DTOModleCourse moodleCourse = new DTOModleCourse();
             List<Cours> courses = new List<Cours>();
-            #region get Categories
-            {
-              
-                var client = new RestClient($"{_configUrl.MoodlebaseUrl}/webservice/rest/server.php");
-                client.Timeout = -1;
-                var request = new RestRequest(Method.GET);
-                request.AddParameter("wstoken", wstoken, ParameterType.QueryString);
-                request.AddParameter("wsfunction", "core_course_get_categories", ParameterType.QueryString);
-                request.AddParameter("moodlewsrestformat", "json", ParameterType.QueryString);
-                IRestResponse response = await client.ExecuteAsync(request);
-                moodleCategories = JsonConvert.DeserializeObject<List<DTOMoodleCategory>>(response.Content);
-            }
-            #endregion
 
-            #region Get Courses
+            if (model.groupId == 0)
             {
+                {
+                    var client = new RestClient($"{_configUrl.MoodlebaseUrl}/webservice/rest/server.php");
+                    client.Timeout = -1;
+                    var request = new RestRequest(Method.GET);
+                    request.AddParameter("wstoken", model.wstoken, ParameterType.QueryString);
+                    request.AddParameter("wsfunction", "core_course_get_categories", ParameterType.QueryString);
+                    request.AddParameter("moodlewsrestformat", "json", ParameterType.QueryString);
+                    IRestResponse response = await client.ExecuteAsync(request);
+                    moodleCategories = JsonConvert.DeserializeObject<List<DTOMoodleCategory>>(response.Content);
+                }
+
                 foreach (var item in moodleCategories)
                 {
                     var client = new RestClient($"{_configUrl.MoodlebaseUrl}/webservice/rest/server.php");
                     client.Timeout = -1;
                     var request = new RestRequest(Method.GET);
-                    request.AddParameter("wstoken", wstoken, ParameterType.QueryString);
+                    request.AddParameter("wstoken", model.wstoken, ParameterType.QueryString);
                     request.AddParameter("wsfunction", "core_course_get_courses_by_field", ParameterType.QueryString);
                     request.AddParameter("field", "category", ParameterType.QueryString);
                     request.AddParameter("value", item.id, ParameterType.QueryString);
@@ -104,13 +105,30 @@ namespace Qorrect.Integration.Controllers
                     courses.AddRange(response.courses.ToList());
                 }
 
-               
             }
-            #endregion
+            else
+            {
+                var client = new RestClient($"{_configUrl.MoodlebaseUrl}/webservice/rest/server.php");
+                client.Timeout = -1;
+                var request = new RestRequest(Method.GET);
+                request.AddParameter("wstoken", model.wstoken, ParameterType.QueryString);
+                request.AddParameter("wsfunction", "core_course_get_courses_by_field", ParameterType.QueryString);
+                request.AddParameter("field", "category", ParameterType.QueryString);
+                request.AddParameter("value", model.groupId, ParameterType.QueryString);
+                request.AddParameter("moodlewsrestformat", "json", ParameterType.QueryString);
+                IRestResponse courseReseponse = await client.ExecuteAsync(request);
+                var response = JsonConvert.DeserializeObject<DTOModleCourse>(courseReseponse.Content);
+                response.courses.Select(c => { c.category = model.groupName; return c; }).ToList();
+                courses.AddRange(response.courses.ToList());
+            }
 
-            var filteredCourses = courses.Where(a => _codes.Contains(a.shortname)).ToList();
+            if (!string.IsNullOrEmpty(model.codes))
+            {
+                courses = courses.Where(a => _codes.Contains(a.shortname)).ToList();
+            }
+                   
 
-            moodleCourse.courses = filteredCourses;
+            moodleCourse.courses = courses;
 
             return Ok(moodleCourse);
         }

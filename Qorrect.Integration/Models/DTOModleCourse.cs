@@ -3,6 +3,15 @@
 namespace Qorrect.Integration.Models
 {
 
+    public class DTOClassFromGroup
+    {
+        public string wstoken { get; set; }
+        public string codes { get; set; }
+        public int groupId { get; set; }
+        public string groupName { get; set; }
+    }
+
+
     public class Cours
     {
         public string fullname { get; set; }
