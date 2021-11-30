@@ -24,13 +24,15 @@ namespace Qorrect.Integration.Controllers
         private readonly IWebHostEnvironment _webHostEnvironment;
         DTOManageUrl _configUrl = null;
         public string bedoIntegrationString { get; set; }
+        private readonly ICacheService _iCahe;
 
-        public ModleController(IConfiguration configuration, IWebHostEnvironment webHostEnvironment)
+        public ModleController(IConfiguration configuration, IWebHostEnvironment webHostEnvironment, ICacheService iCahe)
         {
             _configuration = configuration;
             bedoIntegrationString = _configuration.GetConnectionString("BedoIntegrateConstr");
             _configUrl = new CourseDataAccessLayer().GetMoodleBaseUrl(bedoIntegrationString).Result;
             _webHostEnvironment = webHostEnvironment;
+            _iCahe = iCahe;
         }
 
 
@@ -74,9 +76,15 @@ namespace Qorrect.Integration.Controllers
             List<string> _codes = model.codes.Split(",").ToList();
             List<DTOMoodleCategory> moodleCategories = new List<DTOMoodleCategory>();
             DTOModleCourse moodleCourse = new DTOModleCourse();
-            List<Cours> courses = new List<Cours>();
 
-            if (model.groupId == 0)
+            var cacheKey = "courseList";
+            string serializedCourseList = await _iCahe.GetCachevalueAsync(cacheKey);
+            List<Cours> courses = new List<Cours>();
+            if (serializedCourseList != null)
+            {
+                courses = JsonConvert.DeserializeObject<List<Cours>>(serializedCourseList);
+            }
+            else
             {
                 {
                     var client = new RestClient($"{_configUrl.MoodlebaseUrl}/webservice/rest/server.php");
@@ -104,35 +112,19 @@ namespace Qorrect.Integration.Controllers
                     response.courses.Select(c => { c.category = item.name; return c; }).ToList();
                     courses.AddRange(response.courses.ToList());
                 }
-
-            }
-            else
-            {
-                var client = new RestClient($"{_configUrl.MoodlebaseUrl}/webservice/rest/server.php");
-                client.Timeout = -1;
-                var request = new RestRequest(Method.GET);
-                request.AddParameter("wstoken", model.wstoken, ParameterType.QueryString);
-                request.AddParameter("wsfunction", "core_course_get_courses_by_field", ParameterType.QueryString);
-                request.AddParameter("field", "category", ParameterType.QueryString);
-                request.AddParameter("value", model.groupId, ParameterType.QueryString);
-                request.AddParameter("moodlewsrestformat", "json", ParameterType.QueryString);
-                IRestResponse courseReseponse = await client.ExecuteAsync(request);
-                var response = JsonConvert.DeserializeObject<DTOModleCourse>(courseReseponse.Content);
-                response.courses.Select(c => { c.category = model.groupName; return c; }).ToList();
-                courses.AddRange(response.courses.ToList());
-            }
-
+                serializedCourseList = JsonConvert.SerializeObject(courses);
+                await _iCahe.SetCachevalueAsync(cacheKey, serializedCourseList);
+            }    
             if (!string.IsNullOrEmpty(model.codes))
             {
                 courses = courses.Where(a => _codes.Contains(a.shortname)).ToList();
             }
-                   
+
 
             moodleCourse.courses = courses;
 
             return Ok(moodleCourse);
         }
-
 
         [HttpPost]
         [Route("ImportAllFromModle")]
