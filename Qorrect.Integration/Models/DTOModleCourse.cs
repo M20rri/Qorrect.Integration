@@ -12,6 +12,11 @@ namespace Qorrect.Integration.Models
     }
 
 
+    public class DTOBedoCourseSearchByCode
+    {
+        public string codes { get; set; }
+    }
+
     public class Cours
     {
         public string fullname { get; set; }

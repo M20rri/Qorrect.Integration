@@ -109,7 +109,7 @@ namespace Qorrect.Integration.Controllers
                     request.AddParameter("moodlewsrestformat", "json", ParameterType.QueryString);
                     IRestResponse courseReseponse = await client.ExecuteAsync(request);
                     var response = JsonConvert.DeserializeObject<DTOModleCourse>(courseReseponse.Content);
-                    response.courses.Select(c => { c.category = item.name; return c; }).ToList();
+                    response.courses.Select(c => { c.category = item.name; c.summary = StripHTML(c.summary); return c; }).ToList();
                     courses.AddRange(response.courses.ToList());
                 }
                 serializedCourseList = JsonConvert.SerializeObject(courses);

@@ -10,13 +10,14 @@ namespace Qorrect.Integration.Services
 {
     public class CourseDataAccessLayer
     {
-        public async Task<List<DTOBedoCourse>> GetAllCourses(string connectionString)
+        public async Task<List<DTOBedoCourse>> GetAllCourses(string connectionString, string codes)
         {
             List<DTOBedoCourse> lstCourse = new List<DTOBedoCourse>();
             using (SqlConnection con = new SqlConnection(connectionString))
             {
                 SqlCommand cmd = new SqlCommand("spGetAllCourses", con);
                 cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@str", codes);
                 con.Open();
                 SqlDataReader rdr = cmd.ExecuteReader();
 

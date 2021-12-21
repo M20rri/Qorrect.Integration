@@ -29,18 +29,18 @@ namespace Qorrect.Integration.Controllers
             _configUrl = new CourseDataAccessLayer().GetMoodleBaseUrl(bedoIntegrationString).Result;
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("BedoCousresList")]
-        public async Task<IActionResult> BedoCousresList()
+        public async Task<IActionResult> BedoCousresList([FromBody] DTOBedoCourseSearchByCode model)
         {
-            var bedoCourses = await new CourseDataAccessLayer().GetAllCourses(_configUrl.BedobaseUrl);
+            var bedoCourses = await new CourseDataAccessLayer().GetAllCourses(_configUrl.BedobaseUrl, model.codes);
             return Ok(bedoCourses);
         }
         [HttpGet]
         [Route("GetLostItems/{id}")]
         public async Task<IActionResult> GetLostItems([FromRoute] string id)
         {
-            var bedoCourses = await new CourseDataAccessLayer().GetLostItems(bedoIntegrationString,id);
+            var bedoCourses = await new CourseDataAccessLayer().GetLostItems(bedoIntegrationString, id);
             return Ok(bedoCourses);
         }
         [HttpGet]
@@ -114,8 +114,8 @@ namespace Qorrect.Integration.Controllers
             {
                 int BedoCourseId = bedoCourseitem.Id;
 
-                var bedoCourseLevels = await new CourseDataAccessLayer().GetCourseLevels(_configUrl.BedobaseUrl , bedoCourseitem.Id);
-                congnitiveLevels = await new CourseDataAccessLayer().GetCongitive(_configUrl.BedobaseUrl , bedoCourseitem.Id);
+                var bedoCourseLevels = await new CourseDataAccessLayer().GetCourseLevels(_configUrl.BedobaseUrl, bedoCourseitem.Id);
+                congnitiveLevels = await new CourseDataAccessLayer().GetCongitive(_configUrl.BedobaseUrl, bedoCourseitem.Id);
                 DTOAddEditCourse model = new DTOAddEditCourse()
                 {
                     Name = bedoCourseitem.CourseName,
@@ -287,7 +287,7 @@ namespace Qorrect.Integration.Controllers
 
                                 #region Get Ilos from Bedo
                                 {
-                                    bedoIlos = await new CourseDataAccessLayer().GetLevelIlo(_configUrl.BedobaseUrl , node.Id);
+                                    bedoIlos = await new CourseDataAccessLayer().GetLevelIlo(_configUrl.BedobaseUrl, node.Id);
                                     foreach (var bedoIlo in bedoIlos)
                                     {
                                         {
@@ -361,7 +361,7 @@ namespace Qorrect.Integration.Controllers
                                         foreach (var bedoIlo in bedoIlos)
                                         {
 
-                                            BedoQueastionsWithAnswers = await new CourseDataAccessLayer().GetItemsByIlo(_configUrl.BedobaseUrl , bedoIlo.Id);
+                                            BedoQueastionsWithAnswers = await new CourseDataAccessLayer().GetItemsByIlo(_configUrl.BedobaseUrl, bedoIlo.Id);
                                             //if (BedoQueastionsWithAnswers. == 18777)
                                             //{
                                             //    var zzz = bedoIlo;
@@ -443,7 +443,7 @@ namespace Qorrect.Integration.Controllers
                                                         QuestionID = question.Id
                                                     };
 
-                                                    await new CourseDataAccessLayer().RequestResponseLogger(bedoIntegrationString , logger);
+                                                    await new CourseDataAccessLayer().RequestResponseLogger(bedoIntegrationString, logger);
 
                                                 }
 
@@ -549,7 +549,7 @@ namespace Qorrect.Integration.Controllers
             #region Invisible Added bedo Cousres
             {
                 string ids = string.Join(", ", courseRequest.Courses.Select(p => p.Id));
-                var newCourses = await new CourseDataAccessLayer().InvisibleAddedCourses(_configUrl.BedobaseUrl , ids);
+                var newCourses = await new CourseDataAccessLayer().InvisibleAddedCourses(_configUrl.BedobaseUrl, ids);
             }
             #endregion
 
