@@ -156,9 +156,9 @@ namespace Qorrect.Integration.Models
         public string InsertedItems { get; set; }
         public string LostItems { get; set; }
         public string ResponseBody { get; set; }
-        
+
         public string QuestionID { get; set; }
-        
+
 
     }
     public class DTOBedoCourse
@@ -347,4 +347,42 @@ namespace Qorrect.Integration.Models
         public bool isArchiveStudents { get; set; }
         public bool isArchiveSubjectCreators { get; set; }
     }
+
+    public class DTOOutLineLevel
+    {
+        public string Id { get; set; }
+    }
+
+    public class DTOOutlineNodeChildrenDetails2
+    {
+        public Guid? id { get; set; }
+        public string name { get; set; }
+        public int nodeType { get; set; }
+        public object outlineNodeChildrenDetails { get; set; }
+    }
+
+    public class DTOOutlineNode
+    {
+        public Guid? id { get; set; }
+        public string name { get; set; }
+        public int nodeType { get; set; }
+        public DTOOutlineNodeChildrenDetails2 outlineNodeChildrenDetails { get; set; }
+    }
+
+    public class DTOOutLineRoot
+    {
+        public bool isOutlineStructureApplied { get; set; }
+        public DTOOutlineNode outlineNode { get; set; }
+    }
+
+    public class DTORequestOutLine
+    {
+        public Guid? Id { get; set; }
+        public string Name { get; set; }
+        public Guid? AncestorOutlineNodeId { get; set; }
+        public Guid CourseId { get; set; }
+    }
+
+
+
 }

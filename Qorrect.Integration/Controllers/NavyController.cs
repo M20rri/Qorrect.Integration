@@ -129,7 +129,6 @@ namespace Qorrect.Integration.Controllers
                         LecturesHours = bedoCourseitem.LectureHours,
                         PracticalHours = bedoCourseitem.PracticalHours,
                         TotalHours = bedoCourseitem.ClassesHours,
-                        TotalMarks = bedoCourseitem.TotalMarks,
                         Tags = _Tags
                     }
                 };
@@ -143,6 +142,10 @@ namespace Qorrect.Integration.Controllers
                 request.AddParameter("application/json", JsonConvert.SerializeObject(model), ParameterType.RequestBody);
                 IRestResponse response = client.Execute(request);
                 var item = JsonConvert.DeserializeObject<DTOAddEditCourse>(response.Content);
+
+                DTOOutLineLevel outLineLevel = new DTOOutLineLevel();
+                DTOOutLineRoot outLineRoot = new DTOOutLineRoot();
+
                 #region Apply Outline structure to course
                 {
                     var applyOutlineclient = new RestClient($"{_configUrl.QorrectBaseUrl}/course/applyOutline");
@@ -158,6 +161,40 @@ namespace Qorrect.Integration.Controllers
 
                     applyOutlinerequest.AddParameter("application/json", JsonConvert.SerializeObject(body), ParameterType.RequestBody);
                     IRestResponse applyOutlineresponse = applyOutlineclient.Execute(applyOutlinerequest);
+                    outLineLevel = JsonConvert.DeserializeObject<DTOOutLineLevel>(applyOutlineresponse.Content);
+                }
+                #endregion
+
+
+                #region Change "Unit" to "Topic"
+                {
+                    {
+                        var topicClient = new RestClient($"{_configUrl.QorrectBaseUrl}/course/outlineStructure/{outLineLevel.Id}");
+                        topicClient.Timeout = -1;
+                        var topicRequest = new RestRequest(Method.GET);
+                        topicRequest.AddHeader("Authorization", token);
+                        topicRequest.AddHeader("Content-Type", "application/json");
+                        IRestResponse topicResponse = topicClient.Execute(topicRequest);
+                        outLineRoot = JsonConvert.DeserializeObject<DTOOutLineRoot>(topicResponse.Content);
+                    }
+
+                    {
+                        DTORequestOutLine requestOutLine = new DTORequestOutLine
+                        {
+                            CourseId = item.Id.Value,
+                            Id = outLineRoot.outlineNode.outlineNodeChildrenDetails.id,
+                            Name = "Topic",
+                            AncestorOutlineNodeId = outLineRoot.outlineNode.id
+                        };
+
+                        var postClient = new RestClient($"{_configUrl.QorrectBaseUrl}/outlineNode");
+                        postClient.Timeout = -1;
+                        var postRequest = new RestRequest(Method.POST);
+                        postRequest.AddHeader("Authorization", token);
+                        postRequest.AddHeader("Content-Type", "application/json");
+                        postRequest.AddParameter("application/json", JsonConvert.SerializeObject(requestOutLine), ParameterType.RequestBody);
+                        IRestResponse postResponse = postClient.Execute(postRequest);
+                    }
                 }
                 #endregion
 
