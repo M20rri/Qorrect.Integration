@@ -51,7 +51,7 @@ namespace Qorrect.Integration.Models
     {
         public bool IsShuffleAnswers { get; set; }
         public bool IsAllowForTrialExams { get; set; }
-        public int Difficulty { get; set; }
+        public double? Difficulty { get; set; }
         public int ExpectedTime { get; set; }
         public bool IsAllowedForComputerBasedOnly { get; set; }
     }
@@ -65,7 +65,7 @@ namespace Qorrect.Integration.Models
         public string Comment { get; set; }
         public object Hint { get; set; }
         public object Feedback { get; set; }
-        public int Difficulty { get; set; }
+        public double? Difficulty { get; set; }
     }
     public class DTOEssayStem
     {
@@ -300,7 +300,7 @@ namespace Qorrect.Integration.Models
         public int QuestionTypeID { get; set; }
         public string Answer { get; set; }
         public bool TrueFalse { get; set; }
-
+        public string DifficultyLevel { get; set; }
     }
 
     public class DTOTags

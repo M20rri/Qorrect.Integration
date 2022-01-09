@@ -362,19 +362,31 @@ namespace Qorrect.Integration.Controllers
                                         {
 
                                             BedoQueastionsWithAnswers = await new CourseDataAccessLayer().GetItemsByIlo(_configUrl.BedobaseUrl, bedoIlo.Id);
-                                            //if (BedoQueastionsWithAnswers. == 18777)
-                                            //{
-                                            //    var zzz = bedoIlo;
-                                            //    int cc = questionEssay.Id;
-                                            //}
+
                                             #region MCQ
                                             foreach (var question in BedoQueastionsWithAnswers.Where(x => x.QuestionTypeID == 1))
                                             {
                                                 if (ListOfBedoItemsInsertedtoQorrect.Contains(question.Id)) { continue; }
                                                 ListOfBedoItemsInsertedtoQorrect.Add(question.Id);
                                                 List<DTOAnswer> dTOAnswers = new List<DTOAnswer>();
+                                                double DifficultyLevel = 0;
                                                 foreach (var answer in question.Answers)
                                                 {
+                                                    switch (answer.DifficultyLevel)
+                                                    {
+                                                        case "Mild":
+                                                            DifficultyLevel = 1;
+                                                            break;
+                                                        case "Moderate":
+                                                            DifficultyLevel = 0.5;
+                                                            break;
+                                                        case "Severe":
+                                                            DifficultyLevel = 0.1;
+                                                            break;
+                                                        default:
+                                                            break;
+                                                    }
+
                                                     dTOAnswers.Add(new DTOAnswer
                                                     {
                                                         Text = answer.Answer,
@@ -399,12 +411,12 @@ namespace Qorrect.Integration.Controllers
                                                             Text = question.Stem,
                                                             PlainText = question.Stem,
                                                             Comment = "no",
-                                                            Difficulty = 0,
+                                                            Difficulty = DifficultyLevel,
                                                             Settings = new DTOSettings
                                                             {
                                                                 IsShuffleAnswers = true,
                                                                 IsAllowForTrialExams = true,
-                                                                Difficulty = 1,
+                                                                Difficulty = DifficultyLevel,
                                                                 ExpectedTime = 1,
                                                                 IsAllowedForComputerBasedOnly = true
                                                             },

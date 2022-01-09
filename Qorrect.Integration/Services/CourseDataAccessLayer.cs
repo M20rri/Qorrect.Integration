@@ -174,7 +174,8 @@ namespace Qorrect.Integration.Services
                                     {
                                         QuestionId = AdataRow.Field<int>("QuestionID"),
                                         Answer = AdataRow.Field<string>("Answer"),
-                                        TrueFalse = AdataRow.Field<bool>("TrueFalse")
+                                        TrueFalse = AdataRow.Field<bool>("TrueFalse"),
+                                        DifficultyLevel = AdataRow.Field<string>("DifficultyLevel")
                                     }).Where(a => a.QuestionId == QdataRow.Field<int>("QuestionID")).ToList()
                                 }).ToList();
 
