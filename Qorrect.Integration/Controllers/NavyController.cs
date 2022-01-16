@@ -397,7 +397,6 @@ namespace Qorrect.Integration.Controllers
 
                                         foreach (var bedoIlo in bedoIlos)
                                         {
-
                                             BedoQueastionsWithAnswers = await new CourseDataAccessLayer().GetItemsByIlo(_configUrl.BedobaseUrl, bedoIlo.Id);
 
                                             #region MCQ
@@ -505,6 +504,26 @@ namespace Qorrect.Integration.Controllers
                                             {
                                                 if (ListOfBedoItemsInsertedtoQorrect.Contains(questionEssay.Id)) { continue; }
                                                 ListOfBedoItemsInsertedtoQorrect.Add(questionEssay.Id);
+                                                double DifficultyLevel = 0;
+
+                                                foreach (var answer in questionEssay.Answers)
+                                                {
+                                                    switch (answer.DifficultyLevel)
+                                                    {
+                                                        case "Mild":
+                                                            DifficultyLevel = 1;
+                                                            break;
+                                                        case "Moderate":
+                                                            DifficultyLevel = 0.5;
+                                                            break;
+                                                        case "Severe":
+                                                            DifficultyLevel = 0.1;
+                                                            break;
+                                                        default:
+                                                            break;
+                                                    }
+                                                }
+
                                                 Guid CourseSubscriptionId = Guid.Parse(courseRequest.CourseSubscriptionId);
                                                 var Essayclient = new RestClient($"{_configUrl.QorrectBaseUrl}/item/Essay");
                                                 Essayclient.Timeout = -1;
@@ -529,12 +548,12 @@ namespace Qorrect.Integration.Controllers
 
                                                             },
                                                             Comment = "no",
-                                                            Difficulty = 0,
+                                                            Difficulty = DifficultyLevel,
                                                             Settings = new DTOSettings
                                                             {
                                                                 IsShuffleAnswers = true,
                                                                 IsAllowForTrialExams = true,
-                                                                Difficulty = 1,
+                                                                Difficulty = DifficultyLevel,
                                                                 ExpectedTime = 1,
                                                                 IsAllowedForComputerBasedOnly = true
                                                             },

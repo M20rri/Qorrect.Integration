@@ -77,7 +77,7 @@ namespace Qorrect.Integration.Models
         public string Comment { get; set; }
         public object Hint { get; set; }
         public object Feedback { get; set; }
-        public int Difficulty { get; set; }
+        public double? Difficulty { get; set; }
     }
 
     public class DTOItemMapping
