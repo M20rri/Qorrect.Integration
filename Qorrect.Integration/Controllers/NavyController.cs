@@ -625,11 +625,11 @@ namespace Qorrect.Integration.Controllers
         }
 
         [HttpGet]
-        [Route("QorrectUserModules/{id}")]
-        public async Task<IActionResult> QorrectUserModules([FromRoute] string id)
+        [Route("QorrectUserModules/{id}/{userid}")]
+        public async Task<IActionResult> QorrectUserModules([FromRoute] string id, [FromRoute] string userid)
         {
             string token = $"Bearer {id}";
-            var client = new RestClient($"{_configUrl.QorrectBaseUrl}/account/userDetailsEnrollments/9ab9fa26-8625-4210-ad57-9471a764bc33?page=1&pageSize=500&&roles=SubjectCreator&page=1&pageSize=500");
+            var client = new RestClient($"{_configUrl.QorrectBaseUrl}/account/userDetailsEnrollments/{userid}?page=1&pageSize=500&&roles=SubjectCreator&page=1&pageSize=500");
             client.Timeout = -1;
             var request = new RestRequest(Method.GET);
             request.AddHeader("Accept", "application/json, text/plain, /");
