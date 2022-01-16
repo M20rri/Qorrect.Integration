@@ -604,5 +604,21 @@ namespace Qorrect.Integration.Controllers
 
             return Ok(addedCoursed);
         }
+
+        [HttpGet]
+        [Route("QorrectUserModules/{id}")]
+        public async Task<IActionResult> QorrectUserModules([FromRoute] string id)
+        {
+            string token = $"Bearer {id}";
+            var client = new RestClient($"{_configUrl.QorrectBaseUrl}/account/userDetailsEnrollments/9ab9fa26-8625-4210-ad57-9471a764bc33?page=1&pageSize=500&&roles=SubjectCreator&page=1&pageSize=500");
+            client.Timeout = -1;
+            var request = new RestRequest(Method.GET);
+            request.AddHeader("Accept", "application/json, text/plain, /");
+            request.AddHeader("Authorization", token);
+            request.AddHeader("Accept-Language", "en-US");
+            IRestResponse response = await client.ExecuteAsync(request);
+            string o = response.Content;
+            return Ok(JsonConvert.DeserializeObject<List<DTOModules>>(o));
+        }
     }
 }

@@ -383,6 +383,10 @@ namespace Qorrect.Integration.Models
         public Guid CourseId { get; set; }
     }
 
-
+    public class DTOModules
+    {
+        public string id { get; set; }
+        public string fullName { get; set; }
+    }
 
 }
